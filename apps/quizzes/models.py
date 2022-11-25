@@ -4,21 +4,32 @@ from django.contrib.auth import get_user_model
 UserModel = get_user_model()
 
 
+class QuestionModel(models.Model):
+    class Meta:
+        db_table = 'questions'
+        ordering = ['id']
+
+    question_text = models.CharField(max_length=200, unique=True)
+
+
 class QuizModel(models.Model):
     class Meta:
         db_table = 'quizzes'
+        ordering = ['id']
 
     title = models.CharField(max_length=60)
     description = models.CharField(max_length=200)
     is_active = models.BooleanField(default=False)
-    time_constraint_in_seconds = models.IntegerField()
+    time_constraint_in_seconds = models.IntegerField(default=60)
 
     creator = models.ForeignKey(UserModel, on_delete=models.PROTECT, related_name='created_quizzes')
+    questions = models.ManyToManyField(QuestionModel, related_name='quizzes')
 
 
 class QuizResultModel(models.Model):
     class Meta:
         db_table = 'quizzes_results'
+        ordering = ['id']
 
     max_score = models.IntegerField()
     employee_score = models.IntegerField()
@@ -27,15 +38,6 @@ class QuizResultModel(models.Model):
 
     employee = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='passed_quizzes')
     quiz = models.ForeignKey(QuizModel, on_delete=models.CASCADE, related_name='quiz_results')
-
-
-class QuestionModel(models.Model):
-    class Meta:
-        db_table = 'questions'
-
-    question_text = models.CharField(max_length=200)
-
-    quizzes = models.ManyToManyField(QuizModel, related_name='questions')
 
 
 class AnswerModel(models.Model):
@@ -51,10 +53,9 @@ class AnswerModel(models.Model):
 class CategoryModel(models.Model):
     class Meta:
         db_table = 'categories'
+        ordering = ['id']
 
     category_name = models.CharField(max_length=20)
     description = models.CharField(max_length=200)
 
     questions = models.ManyToManyField(QuestionModel, related_name='categories')
-
-

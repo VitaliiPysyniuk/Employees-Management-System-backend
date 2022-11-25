@@ -163,3 +163,4 @@ charts/
 
 .env.db
 ems_database.drawio
+debug_tools.py
